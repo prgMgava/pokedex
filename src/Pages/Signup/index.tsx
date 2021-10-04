@@ -1,13 +1,14 @@
-import { Formik, Form, Field } from "formik";
+import { useFormik } from "formik";
 import Image from "../../assets/image/voltorb-signup.png";
 import * as yup from "yup";
-import { Button, Box, Grid } from "@mui/material";
+import { Button, Box, Grid, TextField } from "@mui/material";
 
 const styles = {
   gridImage: {
     backgroundImage: `url(${Image})`,
     backgroundPosition: "50% 90%",
     backgroundSize: "100%",
+    backgroundRepeat: "no-repeat",
   },
 };
 
@@ -18,7 +19,7 @@ interface SignupData {
 }
 
 export const Signup = () => {
-  const formSchema = yup.object({
+  const formSchema = yup.object().shape({
     email: yup.string().required("Email is required").email("Email invalid"),
     username: yup
       .string()
@@ -27,9 +28,20 @@ export const Signup = () => {
     password: yup
       .string()
       .required("Password is required")
-      .min(8, "Must contain a minimun of 8 characters"),
+      .min(8, "Must contain a minimum of 8 characters"),
   });
 
+  const formik = useFormik({
+    initialValues: {
+      email: "",
+      password: "",
+      username: "",
+    },
+    validationSchema: formSchema,
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
   const onSubmitFunction = (data: SignupData) => {
     console.log(data);
   };
@@ -38,18 +50,48 @@ export const Signup = () => {
     <Box width="100%" height="100vh">
       <Grid container>
         <Grid item xs={8} height="100vh">
-          <Formik
-            initialValues={{ email: "", username: "", password: "" }}
-            onSubmit={onSubmitFunction}
-            validationSchema={formSchema}
+          <form
+            onSubmit={formik.handleSubmit}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "100vh",
+              flexDirection: "column",
+              gap: "20px",
+            }}
           >
-            <Form>
-              <Field name="username"></Field>
-              <Field name="email"></Field>
-              <Field name="password" type="password"></Field>
-              <Button type="submit"></Button>
-            </Form>
-          </Formik>
+            <TextField
+              style={{width:"100%"}}
+              id="username"
+              name="username"
+              label="Username"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              helperText={formik.touched.username && formik.errors.username}
+            ></TextField>
+            <TextField
+              id="email"
+              name="email"
+              label="Email"
+              value={formik.values.email}
+              onChange={formik.handleChange}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
+            ></TextField>
+            <TextField
+              id="password"
+              name="password"
+              label="Password"
+              type="password"
+              value={formik.values.password}
+              onChange={formik.handleChange}
+              error={formik.touched.password && Boolean(formik.errors.password)}
+              helperText={formik.touched.password && formik.errors.password}
+            ></TextField>
+            <Button type="submit"></Button>
+          </form>
         </Grid>
         <Grid item xs={4} style={styles.gridImage} height="100vh"></Grid>
       </Grid>
